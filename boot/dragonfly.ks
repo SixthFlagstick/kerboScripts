@@ -37,7 +37,7 @@ lock throttle to 1.
 wait until apoapsis >= 75_000.
 
 unlock throttle.
-wait until eta:apoapsis <= 10.
+wait until eta:apoapsis <= 15.
 
 lock throttle to 1.
 wait until periapsis >= 70_000.
