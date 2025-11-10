@@ -16,7 +16,7 @@ lock steering to lookdirup(up:forevector, heading(180, 0):forevector).
 lock throttle to target_twr / thrust_to_weight().
 stage.
 
-wait until apoapsis >= 70_000.
+wait until apoapsis >= 75_000.
 
 wait 1.
 unlock throttle.
