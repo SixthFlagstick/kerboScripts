@@ -27,37 +27,50 @@ if apoapsis > 70_000 and periapsis < 70_000 {
 }
 
 if periapsis > 70_000 {
-    set state to "orbit".
+    set state to "".
     set done to true.
 }
 
 local function main {
-    wait until sas.
-    sas off.
+    if done {
+        return.
+    }
 
-    stage.
-    set steeringmanager:maxstoppingtime to 0.1.
+    until done {
+        if state = "circularize" {
+            wait until eta:apoapsis <= 15.
+            lock throttle to 1.
 
-    lock throttle to desired_twr / thrust_to_weight().
-    lock steering to heading(90, ascent_pitch_function()).
+            wait until periapsis >= 70_000.
 
-    wait until availablethrust = 0.
+            set state to "".
+            set done to true.
+        }
+        if state = "ascent" {
+            if availablethrust = 0 {
+                stage.
+            }
 
-    unlock throttle.
-    lock steering to prograde.
+            set steeringmanager:maxstoppingtime to 0.1.
+            lock throttle to desired_twr / thrust_to_weight().
+            lock steering to heading(90, ascent_pitch_function()).
 
-    wait 0.5.
-    stage.
-    wait 0.5.
+            wait until availablethrust = 0.
+            lock steering to prograde.
+            lock throttle to 1.
+            stage.
 
-    lock throttle to 1.
-    wait until apoapsis >= 75_000.
-
-    unlock throttle.
-    wait until eta:apoapsis <= 15.
-
-    lock throttle to 1.
-    wait until periapsis >= 70_000.
+            wait until apoapsis >= 75_000.
+            unlock throttle.
+            set state to "circularize".
+        }
+        if state = "prelaunch" {
+            wait until sas.
+            sas off.
+            set state to "ascent".
+        }
+        wait 0.01.
+    }
 }
 
 main().
