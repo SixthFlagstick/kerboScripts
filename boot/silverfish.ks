@@ -1,5 +1,6 @@
 wait until ship:unpacked.
 // steps: prelaunch, ascent, circularize, idle, deorbit, descent, done
+//TODO: See if virtual kOS drive is persistent across craft reuse
 
 local function thrust_to_weight {
     local _thrust is max(availablethrust, 0.01).
