@@ -66,8 +66,7 @@ local function main {
 
             wait until availablethrust = 0.
             stage.
-
-            lock throttle to 1.
+            set desired_twr to 1.5.
             lock steering to prograde.
 
             wait until apoapsis >= 75_000.
