@@ -28,7 +28,12 @@ local function main {
     }
 
     until memory:done {
-
+        if memory:step = "prelaunch" {
+            wait until brakes.
+            brakes off.
+            set memory:step to "ascent".
+        }
+        wait 0.
     }
 }
 main().
