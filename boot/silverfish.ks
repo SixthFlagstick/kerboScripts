@@ -22,8 +22,8 @@ local function approx_node_burn_time {
 }
 
 local function vis_viva {
-    parameter r, a.
-    return sqrt(body:mu * (2 / r - 1 / a)).
+    parameter _r, _a.
+    return sqrt(body:mu * (2 / _r - 1 / _a)).
 }
 
 local function semi_major_axis {
