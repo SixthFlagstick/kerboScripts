@@ -29,8 +29,7 @@ local function main {
 
     until memory:done {
         if memory:step = "prelaunch" {
-            wait until brakes.
-            brakes off.
+            wait until availablethrust > 0.
             set memory:step to "ascent".
         }
         wait 0.
