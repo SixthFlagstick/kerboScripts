@@ -9,7 +9,7 @@ local function thrust_to_weight {
 }
 
 local function pitch_profile {
-    local gain is 10.
+    local gain is 12.
     local _alt is max(0, altitude - 250) / 1000.
     local sqrt_alt is sqrt(_alt) * gain.
     return max(0, 90 - sqrt_alt).
@@ -20,14 +20,27 @@ local function main {
         "step", "prelaunch",
         "done", false
     ).
-
     local memory_path is "/memory.json".
-
     if exists(memory_path) {
         set memory to readjson(memory_path).
     }
 
+    local desired_twr is 2.
+
     until memory:done {
+        if memory:step = "ascent" {
+            lock throttle to desired_twr / thrust_to_weight().
+            lock steering to heading(90, pitch_profile()).
+
+            wait until availablethrust = 0.
+            stage.
+
+            lock throttle to 1.
+            lock steering to prograde.
+
+            wait until apoapsis >= 75_000.
+            set memory:step to "circularize".
+        }
         if memory:step = "prelaunch" {
             wait until availablethrust > 0.
             set memory:step to "ascent".
