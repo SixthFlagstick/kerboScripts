@@ -46,6 +46,30 @@ local function main {
     local desired_twr is 2.
 
     until memory:done {
+        if memory:step = "descent" {
+            wait until altitude <= 5_000 and velocity:surface:mag <= 300.
+            stage.
+            set memory:step to "done".
+            set memory:done to true.
+            writejson(memory, memory_path).
+        }
+        if memory:step = "deorbit" {
+            lock throttle to 0.1.
+            lock steering to retrograde.
+            wait until periapsis <= 30_000.
+            unlock throttle.
+            unlock steering.
+            stage.
+            set memory:step to "descent".
+            writejson(memory, memory_path).
+        }
+        if memory:step = "idle" {
+            unlock throttle.
+            unlock steering.
+            wait 30.
+            set memory:step to "deorbit".
+            writejson(memory, memory_path).
+        }
         if memory:step = "circularize" {
             wait until altitude >= body:atm:height.
             local current_sma is semi_major_axis(apoapsis, periapsis).
@@ -59,6 +83,7 @@ local function main {
 
             unlock throttle.
             set memory:step to "idle".
+            writejson(memory, memory_path).
         }
         if memory:step = "ascent" {
             lock throttle to desired_twr / thrust_to_weight().
@@ -72,10 +97,12 @@ local function main {
             wait until apoapsis >= 75_000.
             unlock throttle.
             set memory:step to "circularize".
+            writejson(memory, memory_path).
         }
         if memory:step = "prelaunch" {
             wait until availablethrust > 0.
             set memory:step to "ascent".
+            writejson(memory, memory_path).
         }
         wait 0.
     }
