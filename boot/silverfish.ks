@@ -15,6 +15,12 @@ local function pitch_profile {
     return max(0, 90 - sqrt_alt).
 }
 
+local function approx_node_burn_time {
+    parameter dv.
+    local accel is availablethrust / ship:mass.
+    return dv / accel.
+}
+
 local function main {
     local memory is lexicon(
         "step", "prelaunch",
