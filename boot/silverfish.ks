@@ -21,6 +21,18 @@ local function approx_node_burn_time {
     return dv / accel.
 }
 
+local function vis_viva {
+    parameter r, a.
+    return sqrt(body:mu * (2 / r - 1 / a)).
+}
+
+local function semi_major_axis {
+    parameter ap, pe.
+    local r_a is ap + body:radius.
+    local r_p is pe + body:radius.
+    return (r_a + r_p) / 2.
+}
+
 local function main {
     local memory is lexicon(
         "step", "prelaunch",
@@ -34,6 +46,20 @@ local function main {
     local desired_twr is 2.
 
     until memory:done {
+        if memory:step = "circularize" {
+            wait until altitude >= body:atm:height.
+            local current_sma is semi_major_axis(apoapsis, periapsis).
+            local target_sma is semi_major_axis(apoapsis, 71_000).
+            local burn_dv is vis_viva(apoapsis, target_sma) - vis_viva(apoapsis, current_sma).
+            local burn_time is approx_node_burn_time(burn_dv).
+
+            wait until eta:apoapsis <= burn_time / 2.
+            lock throttle to 1.
+            wait until periapsis >= 71_000.
+
+            unlock throttle.
+            set memory:step to "idle".
+        }
         if memory:step = "ascent" {
             lock throttle to desired_twr / thrust_to_weight().
             lock steering to heading(90, pitch_profile()).
@@ -45,6 +71,7 @@ local function main {
             lock steering to prograde.
 
             wait until apoapsis >= 75_000.
+            unlock throttle.
             set memory:step to "circularize".
         }
         if memory:step = "prelaunch" {
