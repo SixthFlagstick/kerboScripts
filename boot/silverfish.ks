@@ -58,7 +58,7 @@ local function main {
             lock steering to retrograde.
             wait until periapsis <= 30_000.
             unlock throttle.
-            unlock steering.
+            lock steering to srfretrograde.
             stage.
             set memory:step to "descent".
             writejson(memory, memory_path).
@@ -66,20 +66,20 @@ local function main {
         if memory:step = "idle" {
             unlock throttle.
             unlock steering.
-            wait 30.
+            wait until eta:apoapsis <= 1.
             set memory:step to "deorbit".
             writejson(memory, memory_path).
         }
         if memory:step = "circularize" {
             wait until altitude >= body:atm:height.
             local current_sma is semi_major_axis(apoapsis, periapsis).
-            local target_sma is semi_major_axis(apoapsis, 71_000).
+            local target_sma is semi_major_axis(apoapsis, 260_000).
             local burn_dv is vis_viva(apoapsis, target_sma) - vis_viva(apoapsis, current_sma).
             local burn_time is approx_node_burn_time(burn_dv).
 
             wait until eta:apoapsis <= burn_time / 2.
             lock throttle to 1.
-            wait until periapsis >= 71_000.
+            wait until apoapsis >= 260_000.
 
             unlock throttle.
             set memory:step to "idle".
